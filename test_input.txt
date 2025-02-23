@@ -1,5 +1,6 @@
 begin
-a = 10;
-b = a + 5;
-xyz = (b * 3);
+  a_b_7 = 10;
+  ~ this is a comment
+  i = 5; ~ another comment
+  x = i;
 end.
