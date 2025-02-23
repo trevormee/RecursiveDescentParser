@@ -1,3 +1,5 @@
+# Makefile for Scanner Project
+
 # Compiler settings
 CC = gcc
 CFLAGS = -Wall -g
@@ -10,6 +12,9 @@ SRC = main.c scanner.c
 
 # Object files (generated from source files)
 OBJ = $(SRC:.c=.o)
+
+# Include directories (if needed, adjust if you have extra directories)
+INCLUDES = -I.
 
 # Default target: build the executable
 all: $(TARGET)

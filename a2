@@ -1,5 +1,5 @@
 begin
-  a = b;
+  a = b; 
   a = b+2;
 end.
 

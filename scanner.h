@@ -19,7 +19,7 @@
 
 #define MAX_IDENTIFIER_LENGTH 50
 
-const char EOI = '.';
+const char EOI = EOF; 
 const char START_COMMENT = '~';
 const char START_STRING = '"';
 const char END_STRING = '"';
@@ -75,7 +75,7 @@ KeywordMapping KEYWORD_TABLE[] = {
 };
 const int KEYWORD_TABLE_SIZE = sizeof(KEYWORD_TABLE) / sizeof(KEYWORD_TABLE[0]);
 
-const char *eoIToken = "eoI";
+const char *eoIToken = "end.";
 
 // token structure
 typedef struct {

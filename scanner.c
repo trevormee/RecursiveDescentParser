@@ -15,9 +15,10 @@
 //------------------------------
 
 /*
-    @brief
-    @param
-    @return
+    @brief Initializes the scanner with the input file and set up the initial state.
+    @param(s): self - pointer to the Scanner struct
+               source - the input source string file
+    @return N/A
 */
 void initScanner(Scanner *self, const char *source)
 {
@@ -26,18 +27,17 @@ void initScanner(Scanner *self, const char *source)
     strcpy(self->source, source);
     self->source[len] = EOI;
     self->source[len + 1] = '\0';
-
-    self->position = 0;
-               
+    self->position = 0;     
     self->currentText = NULL;     
     self->currentToken = NULL; 
 }
 
 
 /*
-    @brief
-    @param
-    @return
+    @brief Helper function to check if a character is in a given set of characters.
+    @param(s): ch - the character to check
+               set - the set of characters to check against
+    @return 1 if the character is in the set, 0 otherwise
 */
 int inSet(char ch, const char *set)
 {
@@ -50,9 +50,10 @@ int inSet(char ch, const char *set)
 
 
 /*
-    @brief
-    @param
-    @return
+    @brief Prints an error message
+    @param (s): self - pointer to the Scanner struct
+               message - the error message to print
+    @return N/A
 */
 void error(Scanner *self, const char *message)
 {
@@ -61,9 +62,9 @@ void error(Scanner *self, const char *message)
 
 
 /*
-    @brief
-    @param
-    @return
+    @brief Gets the current character in the source string
+    @param self - pointer to the Scanner struct
+    @return current character
 */
 char currentCh(Scanner *self)
 {
@@ -72,9 +73,9 @@ char currentCh(Scanner *self)
 
 
 /*
-    @brief
-    @param
-    @return
+    @brief Moves the scanner to the next character
+    @param self - pointer to the Scanner struct
+    @return N/A
 */
 void move(Scanner *self)
 {
@@ -85,10 +86,11 @@ void move(Scanner *self)
     }
 }
 
+
 /*
-    @brief
-    @param
-    @return
+    @brief Checks if the scanner has reached the end of input 
+    @param self - pointer to the Scanner struct
+    @return 1 if at end of input
 */
 int atEOI(Scanner *self)
 {
@@ -100,9 +102,9 @@ int atEOI(Scanner *self)
 //------------------------------
 
 /*
-    @brief
-    @param
-    @return
+    @brief Same as move, but report error of moving past EOI
+    @param self - pointer to the Scanner struct
+    @return N/A
 */
 void eat(Scanner *self)
 {
@@ -115,9 +117,12 @@ void eat(Scanner *self)
 
 
 /*
-    @brief
-    @param
-    @return
+    @brief Finds the first occurrence of a character in the input stream,
+           reports eorror if none found before EOI, collects all characters
+           found in result string
+    @param(s): self - pointer to the Scanner struct
+               x - the character to find
+    @return a string containing all characters found before x
 */
 char *find(Scanner *self, char x)
 {
@@ -130,7 +135,7 @@ char *find(Scanner *self, char x)
     }
     if (atEOI(self)) {
         char errMsg[256];
-        sprintf(errMsg, "eoi detected searching for %c", x);
+        sprintf(errMsg, "EOI detected searching for %c", x);
         error(self, errMsg);
         return strdup(result);
     } else {
@@ -140,33 +145,39 @@ char *find(Scanner *self, char x)
 
 
 /*
-    @brief
-    @param
-    @return
+    @brief Same as find but look for any character in the set s
+    @param(s): self - pointer to the Scanner struct
+               s - the set of characters to find
+    @return a string containing all characters found before any character in s
 */
 char *findStar(Scanner *self, const char *s)
 {
-    char buffer[256] = {0};
-    int idx = 0;
+    char result[256] = {0};
+    int index = 0;
     while (!inSet(currentCh(self), s) && !atEOI(self)) {
-        buffer[idx++] = currentCh(self);
-        buffer[idx] = '\0';
+        result[index++] = currentCh(self);
+        result[index] = '\0';
         //move(self);
         eat(self);
     }
     if (atEOI(self)) {
         char errMsg[256];
-        sprintf(errMsg, "eoi detected searching for %s", s);
+        sprintf(errMsg, "EOI detected searching for %s", s);
         error(self, errMsg);
-        return strdup(buffer);
+        return strdup(result);
     } else {
-        return strdup(buffer);
+        return strdup(result);
     }
 }
+
+
 /*
-    @brief
-    @param
-    @return
+    @brief Run over character "x" down the input stream, 
+           report error if none other found before EOI,
+           collect all characters found in a result string
+    @param (s): self - pointer to the Scanner struct
+               x - the character to skip
+    @return a string containing all characters found before x
 */
 char *skip(Scanner *self, char *x)
 {
@@ -180,10 +191,13 @@ char *skip(Scanner *self, char *x)
 
     return strdup(result);
 }
+
+
 /*
-    @brief
-    @param
-    @return
+    @brief Same as skip, but for a set s
+    @param(s): self - pointer to the Scanner struct
+               s - the set of characters to find
+    @return a string containing all characters found before any character in s
 */
 char *skipStar(Scanner *self, const char *s)
 {
@@ -197,46 +211,46 @@ char *skipStar(Scanner *self, const char *s)
 
     return strdup(result);
 }
+
+
 /*
-    @brief
-    @param
-    @return
+    @brief Skip over all whitespace
+    @param self - pointer to the Scanner struct
+    @return N/A
 */
 void skipWhitespace(Scanner *self)
 {
     char *temp = skipStar(self, WHITESPACE);
     free(temp);
 }
+
+
 /*
-    @brief
-    @param
-    @return
+    @brief Skip over everything up to end of comment
+    @param self - pointer to the Scanner struct
+    @return N/A
 */
 void skipComment(Scanner *self)
 {
-    // eat(self);
-    // char *temp = findStar(self, "\n");
-    // if (temp != NULL) {
-    //     free(temp);
-    // }
-    // else {
-    //     error(self, "Error: No newline found in comment");
-    // }
-    // free(temp);
-    // eat(self);
-    eat(self); // Move past the comment character (assuming it's // or #)
+    if (currentCh(self) == START_COMMENT) {
+        eat(self);
+    }
+
     while (currentCh(self) != '\n' && !atEOI(self)) {
         eat(self);
     }
-    if (!atEOI(self)) {
-        eat(self); // Move past the newline character itself
-    }
 
+    if (!atEOI(self) && currentCh(self) == '\n') {
+        eat(self);
+    }
 }
+
+
+
 /*
-    @brief
-    @param
-    @return
+    @brief Move over whiespace or comment (basd on current character)
+    @param self - pointer to the Scanner struct
+    @return N/A
 */
 void jump(Scanner *self)
 {
@@ -246,33 +260,28 @@ void jump(Scanner *self)
         skipComment(self);
     }
 }
+
+
 /*
-    @brief
-    @param
-    @return
+    @brief Move over whitespace or comment 
+    @param self - pointer to the Scanner struct
+    @return N/A
 */
 void jumpStar(Scanner *self)
 {
-    // while(inSet(currentCh(self), WHITESPACE) || currentCh(self) == START_COMMENT) {
-    //     jump(self);
-    // }
-    while (inSet(currentCh(self), WHITESPACE) || currentCh(self) == START_COMMENT) {
-        if (inSet(currentCh(self), WHITESPACE)) {
-            skipWhitespace(self);
-        } else if (currentCh(self) == START_COMMENT) {
-            skipComment(self);
-        }
+    while(inSet(currentCh(self), WHITESPACE) || currentCh(self) == START_COMMENT) {
+        jump(self);
     }
-
 }
 
 //------------------------------
 // C. High level tokenizers
 //------------------------------
+
 /*
-    @brief
-    @param
-    @return
+    @brief Skip over digits and return a string of digits
+    @param self - pointer to the Scanner struct
+    @return a string of digits
 */
 Token NUM(Scanner *self)
 {
@@ -291,37 +300,20 @@ Token NUM(Scanner *self)
     @param
     @return
 */
-// Token ID(Scanner *self)
-// {
-//     Token t;
-//     t.token = strdup("identifier");
-//     t.isNum = 0;
-//     char *idStr = skipStar(self, LETTERS); 
-//     char buffer[256];
-//     strcpy(buffer, idStr);
-//     free(idStr);
-//     char *rest = skipStar(self, DIGITS);
-//     strcat(buffer, rest);
-//     free(rest);
-//     t.lexeme.str = strdup(buffer);
-//     return t;
-// }
 Token ID(Scanner *self)
 {
     Token t;
     t.token = strdup("identifier");
     t.isNum = 0;
 
-    char buffer[256]; // Buffer to store identifier
-    int idx = 0;
+    char result[256]; 
+    int index = 0;
 
-    // The first character must be a letter
-    buffer[idx++] = currentCh(self);
+    result[index++] = currentCh(self);
     eat(self);
 
     int prevUnderscore = 0; // Flag to track consecutive underscores
 
-    // Continue parsing while the character is a letter, number, or underscore
     while (inSet(currentCh(self), LETTERS_DIGITS) && !atEOI(self))
     {
         char ch = currentCh(self);
@@ -330,7 +322,7 @@ Token ID(Scanner *self)
         {
             if (prevUnderscore)
             {
-                error(self, "Invalid identifier: Consecutive underscores are not allowed.");
+                error(self, "Syntax Error! Consecutive underscores not allowed.");
                 break;
             }
             prevUnderscore = 1; // Set flag if underscore found
@@ -340,28 +332,27 @@ Token ID(Scanner *self)
             prevUnderscore = 0; // Reset flag if it's not an underscore
         }
 
-        buffer[idx++] = ch;
+        result[index++] = ch;
         eat(self);
     }
 
-    // If the last character was an underscore, it's invalid
-    if (buffer[idx - 1] == '_')
+    if (result[index - 1] == '_')
     {
         error(self, "Invalid identifier: Cannot end with an underscore.");
-        return (Token){NULL, {NULL}, 0}; // Return invalid token
+        return (Token){NULL, 0, 0};
     }
 
-    buffer[idx] = '\0'; // Null-terminate the identifier
-    t.lexeme.str = strdup(buffer);
+    result[index] = '\0'; 
+    t.lexeme.str = strdup(result);
 
     return t;
 }
 
 
 /*
-    @brief
-    @param
-    @return
+    @brief Skips over everything up to the end of the string
+    @param self - pointer to the Scanner struct
+    @return scanned string
 */
 Token STRI(Scanner *self)
 {
@@ -378,13 +369,18 @@ Token STRI(Scanner *self)
     else {
         error(self, "Error: No end string found");
     }
-    return t;
 
+    return t;
 }
+
+
 /*
-    @brief
-    @param
-    @return
+    @brief Scans a possibly two-character token (e.g., ==, !=, >=, <=)
+    @param self - pointer to the Scanner struct
+           secondCh - the second character to check for
+           firstToken - the token to return if secondCh is not found
+           secondToken - the token to return if secondCh is found
+    @return a string containing the token
 */
 char *twoCharSym(Scanner *self, char secondCh, const char *firstToken, const char *secondToken)
 {
@@ -396,10 +392,14 @@ char *twoCharSym(Scanner *self, char secondCh, const char *firstToken, const cha
         return strdup(firstToken);
     }
 }
+
+
 /*
-    @brief
-    @param
-    @return
+    @brief Scans the next token in the input stream
+           and returns a Token struct containing the token class
+           and lexeme.
+    @param self - pointer to the Scanner struct
+    @return class and leeme of the next token
 */
 Token nextToken(Scanner *self)
 {
@@ -408,14 +408,24 @@ Token nextToken(Scanner *self)
     t.lexeme.str = NULL;
     t.isNum = 0;
 
+    // Trivial test of EOI
     if(atEOI(self)) {
         t.token = strdup(eoIToken);
         return t;
     }
 
+    // Find next token start
     jumpStar(self);
 
+    // Check the character at the current position
     char currentChar = currentCh(self);
+
+    if(currentChar == START_COMMENT)
+    {
+        skipComment(self);
+    }
+
+    // Start all of the possibilities (hopefully)
 
     if (inSet(currentChar, DIGITS))
     {

@@ -3,7 +3,9 @@
   File Name: main.c
   Project 1
 
-  @brief 
+  @brief Contains the main function for the scanner. It initializes 
+         the scanner, reads the input file, and prints the tokens 
+         and lexemes.
 ***************************************************************/
 
 #include "scanner.h"
@@ -18,22 +20,24 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
+    // open the input file
     FILE *file = fopen(argv[1], "r");
     if (!file) {
         perror("Error opening file");
         return 1;
     }
 
+    // convert the input file to a string
     char source[MAX_FILE_SIZE];
     size_t length = fread(source, 1, MAX_FILE_SIZE - 1, file);
-    source[length] = '\0'; // Null-terminate the string
+    source[length] = '\0'; 
     fclose(file);
 
-    //const char *source = "a=10; b = 5;  $";
+    // initialize scanner
     Scanner scanner; 
     initScanner(&scanner, source);
-    //initScanner(&scanner,argv[1]);
 
+    // do the scanning
     Token token;
     do
     {
@@ -41,17 +45,11 @@ int main(int argc, char *argv[]) {
         printf("Token: %s", token.token);
         
          if (token.isNum) {
-             printf(", Lexeme (num): %d", token.lexeme.num);
+             printf(", Lexeme: %d", token.lexeme.num);
          } else if (token.lexeme.str != NULL) {
                  printf(", Lexeme: %s", token.lexeme.str);
         }
             printf("\n");
-            //free(token.token);
-        //     if (token.lexeme.str != NULL) {
-        //         free(token.lexeme.str);
-        //     }
-        // } else {
-        //     break;
     }while(token.token != NULL && strcmp(token.token, eoIToken) != 0);
 
     free(scanner.source);
